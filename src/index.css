@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+@import "tailwindcss";
+
+/* === Tema (suas variáveis e estilos) === */
+:root {
+  --black: #000000;
+  --red: #2877b8;
+  --white: #FFFFFF;
+  --gray-light: #D1D5DB;
+  --gray-dark: #374151;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--black);
+}
+
+/* Botões */
+.btn-primary {
+  background: var(--red);
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #2877b8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--red);
+  color: var(--red);
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--red);
+  color: var(--white);
+}
+
+/* Navegação */
+.nav-item {
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.nav-item.active {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--red);
+}
+
+.nav-item.active svg {
+  color: var(--red);
+}
+
+/* Cartões */
+.card {
+  background: #111111;
+  border: 1px solid #333333;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: var(--red);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Inputs */
+.input-field {
+  background: #111111;
+  border: 2px solid #333333;
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: var(--red);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Utilidades extras */
+.divider {
+  border-bottom: 1px solid #333333;
+}
+
+.red-title {
+  color: var(--red);
+}
+
+.modal {
+  backdrop-filter: blur(8px);
+}
+
+/* Dashboard */
+.dashboard-card {
+  background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card:hover {
+  border-color: var(--red);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.1);
+}
+
+.premium-badge {
+  background: linear-gradient(135deg, #2877b8, #2877b8);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Listas/itens */
+.client-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.client-item:hover {
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.client-name-clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.client-name-clickable:hover {
+  color: var(--red);
+}
+
+.session-date-group {
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* Tags / Upload */
+.specialty-tag {
+  background: var(--blue);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  margin: 4px;
+}
+
+.specialty-tag .remove-tag {
+  margin-left: 8px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.specialty-tag .remove-tag:hover {
+  opacity: 1;
+}
+
+.file-upload {
+  border: 2px dashed #333;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.file-upload:hover {
+  border-color: var(--blue);
+  background: rgba(220, 38, 38, 0.05);
+}
