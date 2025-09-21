@@ -4,6 +4,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicOnlyRoute from "./routes/PublicOnlyRoute"; // opcional
 
 import Login from "./pages/Login/Login";
+import Cadastro from "./pages/Cadastro/Cadastro";
 import IA from "./pages/IA/IA";
 
 
@@ -24,7 +25,16 @@ export default function App() {
               </PublicOnlyRoute>
             }
           />
-          
+
+          <Route
+            path="/cadastro"
+            element={
+              <PublicOnlyRoute>
+                <Cadastro />
+              </PublicOnlyRoute>
+            }
+          />
+
           {/* grupo de PRIVADAS */}
           <Route element={<ProtectedRoute />}>
             <Route path="/ia" element={<IA />} />

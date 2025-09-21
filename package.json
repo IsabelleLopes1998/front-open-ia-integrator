@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:mock": "cross-env VITE_USE_MOCK_AUTH=true vite",
+    "dev:real": "cross-env VITE_USE_MOCK_AUTH=false VITE_API_URL=http://localhost:3000 vite"
   },
   "dependencies": {
     "react": "^19.1.1",

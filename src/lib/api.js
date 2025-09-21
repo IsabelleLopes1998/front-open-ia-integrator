@@ -1,15 +1,20 @@
-// src/lib/api.js
 import { loadAuth, clearAuth, saveAuth } from "../auth/auth-storage";
 
 const baseURL = import.meta?.env?.VITE_API_URL || "http://localhost:3000";
-const USE_MOCK = import.meta?.env?.VITE_USE_MOCK_AUTH === "true";
+
+const USE_MOCK = String(import.meta?.env?.VITE_USE_MOCK_AUTH || "").trim().toLowerCase() === "true";
+
+console.debug("[api] VITE_USE_MOCK_AUTH raw =", import.meta.env.VITE_USE_MOCK_AUTH);
+console.debug("[api] USE_MOCK computed =", USE_MOCK);
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-
-let refreshing = null; // Promise em andamento de refresh
+let refreshing = null;
 
 
 export async function apiFetch(path, options = {}) {
+  console.debug("[apiFetch] USE_MOCK:", USE_MOCK, "path:", path, "method:", options.method || "GET");
+
   if (USE_MOCK) {
     return mockApiFetch(path, options);
   }
@@ -26,7 +31,7 @@ export async function apiFetch(path, options = {}) {
   const auth = loadAuth(); // { token, refreshToken, user? }
   if (auth?.token) headers.set("Authorization", `Bearer ${auth.token}`);
 
-  // prepara fetch init
+
   const init = {
     method: options.method || "GET",
     headers,
@@ -39,22 +44,16 @@ export async function apiFetch(path, options = {}) {
     signal: options.signal,
   };
 
-  // 1ª tentativa
   let res = await fetch(url, init);
-
-  // Se 401, tenta refresh (se houver refreshToken)
   if (res.status === 401 && auth?.refreshToken) {
     try {
       await ensureRefreshToken(auth.refreshToken);
-      // reenvia com novo token
       const newAuth = loadAuth();
       const retryHeaders = new Headers(headers);
       if (newAuth?.token) retryHeaders.set("Authorization", `Bearer ${newAuth.token}`);
       res = await fetch(url, { ...init, headers: retryHeaders });
     } catch {
-      // refresh falhou: limpar sessão e redirecionar
       clearAuth();
-      // evite loop em testes automatizados; no app real pode redirecionar:
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -77,9 +76,7 @@ export const api = {
   del: (p, opt) => apiFetch(p, { ...opt, method: "DELETE" }),
 };
 
-/**
- * Refresh token: garante uma única chamada concorrente
- */
+
 async function ensureRefreshToken(refreshToken) {
   if (!refreshing) {
     refreshing = doRefresh(refreshToken)
@@ -94,7 +91,6 @@ async function ensureRefreshToken(refreshToken) {
 }
 
 async function doRefresh(refreshToken) {
-  // ajuste o endpoint conforme o backend
   const res = await fetch(baseURL + "/api/user/refresh", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -114,12 +110,15 @@ async function doRefresh(refreshToken) {
     throw new Error("Refresh falhou: token ausente.");
   }
 
-
+  // salva no storage (você precisa expor saveAuth no auth-storage)
   const current = loadAuth() || {};
   saveAuth({ ...current, token: newToken, refreshToken: newRefresh });
   return newToken;
 }
 
+/**
+ * Parse genérico de corpo (json/text)
+ */
 async function parseBody(res) {
   const text = await res.text();
   try {
@@ -129,10 +128,12 @@ async function parseBody(res) {
   }
 }
 
-
+/**
+ * Converte Response em Error com status e data
+ */
 async function toApiError(res) {
   const body = await parseBody(res);
-  const err = new Error(body?.message || body?.error || `HTTP ${res.status}`);
+  const err = new Error(body?.message || body?.error ||`HTTP ${res.status}`);
   err.status = res.status;
   err.data = body;
   return err;

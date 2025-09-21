@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
-
+//import { useEffect } from "react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,7 +13,11 @@ export default function Login() {
   const location = useLocation();
   const { login } = useAuth();
 
-
+//   useEffect(() => {
+//   if (isAuthenticated) {
+//     navigate("/agenda", { replace: true });
+//   }
+// }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +27,7 @@ export default function Login() {
       
       await login({ email, password: senha });
 
-      const redirectTo = location.state?.from || "/ia";
+      const redirectTo = location.state?.from || "/agenda";
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err?.data?.message || "Falha no login. Verifique suas credenciais.");
@@ -37,8 +41,8 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Cabeçalho */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">IA Integrator</h1>
-          <p className="text-gray-400">Plataforma de integração com Ia</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Gestor TattooAli</h1>
+          <p className="text-gray-400">Plataforma de gestão profissional</p>
         </div>
 
         {/* Card */}

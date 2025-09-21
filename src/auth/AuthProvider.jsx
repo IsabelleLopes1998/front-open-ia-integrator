@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./context";
 
+// ✅ usa seu cliente centralizado e o storage unificado
 import { api } from "../lib/api";
 import { loadAuth, saveAuth, clearAuth } from "./auth-storage";
 
@@ -12,6 +13,7 @@ export default function AuthProvider({ children }) {
   const [isBooting, setIsBooting] = useState(true);
   const navigate = useNavigate();
 
+  // Hidrata sessão ao iniciar o app
   useEffect(() => {
     const auth = loadAuth(); 
     if (auth?.token) {
@@ -21,7 +23,7 @@ export default function AuthProvider({ children }) {
     setIsBooting(false);
   }, []);
 
-  
+  // LOGIN via lib/api
   async function login({ email, password }) {
     try {
       const data = await api.post("/api/user/login", { email, senha: password });
@@ -48,7 +50,7 @@ export default function AuthProvider({ children }) {
 
       setToken(jwt);
       setUser(authToSave.user);
-      navigate("/agenda", { replace: true });
+      navigate("/ia", { replace: true });
     } catch (err) {
       clearAuth();
       const msg =
@@ -61,7 +63,7 @@ export default function AuthProvider({ children }) {
     }
   }
 
-  // REGISTER
+  // REGISTER via lib/api
   async function register({ nome, sobrenome, cpf, email, password, telefone }) {
     try {
       const body = {
@@ -69,18 +71,16 @@ export default function AuthProvider({ children }) {
         sobrenome,
         cpf,
         email,
-        senha: password,        // backend espera "senha"
+        senha: password,              
         ...(telefone ? { telefone } : {}),
       };
 
       const res = await api.post("/api/user/register", body);
 
-      // seu back retorna { message: "Usuário criado com sucesso" }
       if (!res?.message) {
         console.log("[Auth] register: resposta inesperada:", res);
       }
 
-      // fluxo definido: após cadastro, ir para login
       navigate("/login", { replace: true });
       return res;
     } catch (err) {
@@ -108,7 +108,7 @@ export default function AuthProvider({ children }) {
     user,
     isBooting,
     login,
-    register,  
+    register,
     logout,
   };
 
