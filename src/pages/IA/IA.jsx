@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import { downloadImage, generateFilenameFromPrompt, base64ToObjectURL, revokeObjectURL } from "../../services";
 import DownloadModal from "../../components/DownloadModal";
+import { api } from "../../lib/api";
 
 export default function IA() {
   const [prompt, setPrompt] = useState("");
@@ -25,31 +26,43 @@ export default function IA() {
     setIsEvaluating(false);
     setCurrentImage(null);
 
-    // Simulação de resposta da OpenAI (substitua pela chamada real da API)
-    setTimeout(() => {
-      const id = Date.now();
-      // Simulando base64 de uma imagem (em produção, viria da OpenAI)
-      const mockBase64 = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
-      
-      // Converte base64 para URL de objeto para exibição
-      const objectURL = base64ToObjectURL(mockBase64);
-      
-      if (objectURL) {
-        const newImage = { 
-          url: objectURL, 
-          base64: mockBase64,
-          prompt: prompt,
-          id: id,
-          approved: false,
-          status: 'pending' // pending, approved, rejected
-        };
+    try {
+      // Chamada real para o backend
+      const response = await api.post('/api/image/generate-base64', {
+        prompt: prompt,
+        model: "dall-e-3",
+        size: "1024x1024",
+        quality: "standard",
+        style: "vivid"
+      });
+
+      if (response.success && response.base64) {
+        // Converte base64 para URL de objeto para exibição
+        const base64Data = `data:image/png;base64,${response.base64}`;
+        const objectURL = base64ToObjectURL(base64Data);
         
-        setCurrentImage(newImage);
-        setIsEvaluating(true);
+        if (objectURL) {
+          const newImage = { 
+            url: objectURL, 
+            base64: base64Data,
+            prompt: prompt,
+            id: Date.now(),
+            approved: false,
+            status: 'pending'
+          };
+          
+          setCurrentImage(newImage);
+          setIsEvaluating(true);
+        }
+      } else {
+        throw new Error('Resposta inválida do servidor');
       }
-      
+    } catch (error) {
+      console.error('Erro ao gerar imagem:', error);
+      alert(`Erro ao gerar imagem: ${error.message}`);
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   }
 
   function handleConfirmImage() {
