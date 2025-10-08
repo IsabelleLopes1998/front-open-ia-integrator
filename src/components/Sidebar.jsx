@@ -52,15 +52,11 @@ export default function Sidebar() {
         {/* Logo / Header */}
         <div className="px-6 py-6 border-b border-[#222]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" />
-              </svg>
-            </div>
+            <img
+              src="/favicon.svg"
+              alt="Open IA Integrator"
+              className="w-10 h-10 rounded-xl object-cover"
+            />
             <div>
               <p className="text-white font-semibold leading-tight">
                 Ia integrator 

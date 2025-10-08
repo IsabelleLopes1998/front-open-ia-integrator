@@ -117,11 +117,11 @@ export default function IA() {
           {/* Header do Chat */}
           <div className="bg-[#0b0b0b] border-b border-[#333] px-6 py-4 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" />
-                </svg>
-              </div>
+              <img
+                src="/favicon.svg"
+                alt="Open IA Integrator"
+                className="w-10 h-10 rounded-xl object-cover"
+              />
               <div>
                 <h1 className="text-xl font-bold text-white">Gerador de Imagens IA</h1>
                 <p className="text-gray-400 text-sm">Descreva sua tatuagem ideal</p>
