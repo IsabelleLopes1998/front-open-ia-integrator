@@ -4,68 +4,44 @@
  */
 
 /**
- * Baixa uma imagem localmente a partir de base64 ou URL
- * @param {string} imageData - Base64 string ou URL da imagem
+ * Baixa uma imagem a partir de uma URL
+ * @param {string} imageUrl - URL da imagem
  * @param {string} filename - Nome do arquivo (opcional)
  */
-export async function downloadImage(imageData, filename = null) {
+export async function downloadImage(imageUrl, filename = null) {
   try {
+    // Busca a imagem por URL com configurações específicas para CORS
+    console.log('🔄 Baixando imagem da URL:', imageUrl);
+
     let blob;
-    
-    // Detecta automaticamente se é base64 ou URL
-    const isBase64 = imageData.startsWith('data:image/') || 
-                     (imageData.length > 100 && !imageData.startsWith('http'));
-    
-    if (isBase64) {
-      // Converte base64 para blob
-      const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    try {
+      const response = await fetch(imageUrl, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        headers: { 'Accept': 'image/*' }
+      });
+
+      if (!response.ok) {
+        console.error('❌ Erro na resposta:', response.status, response.statusText);
+        throw new Error(`Erro ao buscar a imagem: ${response.status} ${response.statusText}`);
       }
-      
-      const byteArray = new Uint8Array(byteNumbers);
-      blob = new Blob([byteArray], { type: 'image/png' });
-    } else {
-      // Busca a imagem por URL com configurações específicas para CORS
-      console.log('🔄 Baixando imagem da URL:', imageData);
-      
-      try {
-        const response = await fetch(imageData, {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit',
-          headers: {
-            'Accept': 'image/*',
-          }
-        });
-        
-        if (!response.ok) {
-          console.error('❌ Erro na resposta:', response.status, response.statusText);
-          throw new Error(`Erro ao buscar a imagem: ${response.status} ${response.statusText}`);
-        }
-        
-        blob = await response.blob();
-        console.log('✅ Blob criado com sucesso:', blob.size, 'bytes');
-      } catch (fetchError) {
-        console.warn('⚠️ Fetch falhou por CORS, usando método alternativo:', fetchError.message);
-        
-        // Método alternativo: Abrir em nova aba
-        const newWindow = window.open(imageData, '_blank');
-        if (newWindow) {
-          console.log('✅ Imagem aberta em nova aba');
-          return { 
-            success: true, 
-            filename: filename || generateFilenameFromPrompt('imagem'),
-            method: 'new-tab',
-            message: 'Imagem aberta em nova aba. Use Ctrl+S para salvar.'
-          };
-        } else {
-          throw new Error('Não foi possível abrir a imagem');
-        }
+
+      blob = await response.blob();
+      console.log('✅ Blob criado com sucesso:', blob.size, 'bytes');
+    } catch (fetchError) {
+      console.warn('⚠️ Fetch falhou por CORS, usando método alternativo:', fetchError.message);
+      const newWindow = window.open(imageUrl, '_blank');
+      if (newWindow) {
+        console.log('✅ Imagem aberta em nova aba');
+        return {
+          success: true,
+          filename: filename || generateFilenameFromPrompt('imagem'),
+          method: 'new-tab',
+          message: 'Imagem aberta em nova aba. Use Ctrl+S para salvar.'
+        };
       }
+      throw fetchError;
     }
     
     // Cria URL temporária para o blob
