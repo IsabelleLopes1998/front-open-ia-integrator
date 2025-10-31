@@ -8,36 +8,37 @@ export default function DownloadModal({
   prompt 
 }) {
   const [downloading, setDownloading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [feedback, setFeedback] = useState("");
 
   if (!isOpen || !imageData) return null;
 
-  const handleDownload = async () => {
+  const startConfirmDownload = () => {
+    setFeedback("");
+    setShowConfirm(true);
+  };
+
+  const confirmAndDownload = async () => {
     setDownloading(true);
-    
+    setShowConfirm(false);
     try {
       const filename = generateFilenameFromPrompt(prompt);
-      
-      // Usa o método principal de download com URL
       const result = await downloadImage(imageData.url, filename);
-      
+
       if (result.success) {
         console.log(`Imagem baixada: ${result.filename}`);
-        
         if (result.method === 'new-tab') {
-          // Não mostra alert, apenas log - o usuário já viu a imagem abrir
+          // Apenas log informativo; o usuário verá a nova aba
           console.log('Imagem aberta em nova aba para download manual');
-        } else {
-          alert(`✅ Download concluído!\nArquivo: ${result.filename}`);
         }
-        
-        onClose(); // Fecha o modal após sucesso
+        onClose();
       } else {
         console.error('Erro no download:', result.error);
-        alert('⚠️ Download automático não funcionou.\n\nUse o botão "Abrir em Nova Aba" e pressione Ctrl+S para salvar manualmente.');
+        setFeedback('Não foi possível baixar automaticamente. Use "Abrir em Nova Aba" e salve com Ctrl+S.');
       }
     } catch (error) {
       console.error('Erro ao processar download:', error);
-      alert('Erro ao processar download. Tente novamente.');
+      setFeedback('Erro ao processar download. Tente novamente.');
     } finally {
       setDownloading(false);
     }
@@ -68,6 +69,11 @@ export default function DownloadModal({
 
         {/* Content */}
         <div className="p-6">
+        {feedback && (
+          <div className="mb-4 p-3 rounded-lg border border-yellow-600/40 bg-yellow-900/20 text-yellow-200 text-sm">
+            {feedback}
+          </div>
+        )}
           {/* Imagem */}
           <div className="mb-6">
             <img 
@@ -106,7 +112,7 @@ export default function DownloadModal({
               {/* Botões */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
-                  onClick={handleDownload}
+                  onClick={startConfirmDownload}
                   disabled={downloading}
                   className="btn-primary px-8 py-3 rounded-lg font-semibold disabled:opacity-60 inline-flex items-center justify-center gap-2 order-1"
                 >
@@ -144,6 +150,38 @@ export default function DownloadModal({
                   Cancelar
                 </button>
               </div>
+
+              {/* Popup de confirmação */}
+              {showConfirm && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                  <div className="card max-w-md w-full rounded-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-[#333]">
+                      <h3 className="text-lg font-semibold text-white">Confirmar download</h3>
+                    </div>
+                    <div className="p-6">
+                      <p className="text-gray-300 mb-4">
+                        Deseja baixar o arquivo
+                        <span className="text-white font-medium"> {generateFilenameFromPrompt(prompt)} </span>
+                        agora?
+                      </p>
+                      <div className="flex gap-3 justify-end">
+                        <button
+                          onClick={() => setShowConfirm(false)}
+                          className="px-5 py-2 rounded-lg font-semibold border border-[#333] text-gray-300 hover:text-white hover:border-gray-500 transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={confirmAndDownload}
+                          className="btn-primary px-6 py-2 rounded-lg font-semibold inline-flex items-center gap-2"
+                        >
+                          Confirmar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
         </div>
       </div>
     </div>

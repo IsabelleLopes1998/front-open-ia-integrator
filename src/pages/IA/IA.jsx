@@ -39,22 +39,23 @@ export default function IA() {
     setPrompt("");
 
     try {
-      // Chamada real para o backend usando o endpoint com URL
-      const response = await api.post('/api/image/generate', {
+      // Chamada para o backend usando o endpoint com URL e armazenamento no Supabase
+      const response = await api.post('/api/image/generate-url', {
         prompt: currentPrompt,
         model: "dall-e-3",
         size: "1024x1024",
         quality: "standard",
-        style: "vivid"
+        style: "vivid",
+        store: true
       });
 
-      if (response.success && response.data && response.data.url) {
+      if (response.success && response.data && (response.data.url || response.stored?.url)) {
         const imageMessage = {
           id: Date.now() + 1,
           type: 'ai',
           content: currentPrompt,
           image: {
-            url: response.data.url,
+            url: response.stored?.url || response.data.url,
             prompt: currentPrompt,
             id: Date.now(),
             created: response.data.created,
