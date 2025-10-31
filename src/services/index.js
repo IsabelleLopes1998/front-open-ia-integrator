@@ -5,10 +5,7 @@
 // IA Services
 export {
   downloadImage,
-  base64ToObjectURL,
-  generateFilenameFromPrompt,
-  isValidBase64,
-  revokeObjectURL
+  generateFilenameFromPrompt
 } from './serviceIA';
 
 // Futuros serviços podem ser adicionados aqui
